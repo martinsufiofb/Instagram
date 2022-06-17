@@ -97,5 +97,14 @@
         android:layout_toEndOf="@+id/tvTitle2Details"
         android:text="TextView" />
 
+    <TextView
+        android:id="@+id/tvTimeStampDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="33dp"
+        android:layout_toEndOf="@+id/tvTitleDetails"
+        android:text="TextView" />
+
 
 </RelativeLayout>
