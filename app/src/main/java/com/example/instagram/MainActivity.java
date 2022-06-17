@@ -2,65 +2,60 @@ package com.example.instagram;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
+import com.example.instagram.fragments.ComposeFragment;
+import com.example.instagram.fragments.HomeFragment;
+import com.example.instagram.fragments.ProfileFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
-    public static final String TAG = "MainActivity";
-    public RecyclerView rvPosts;
-    protected PostsAdapter adapter;
-    protected List<Post> allPosts;
-    private SwipeRefreshLayout swipeContainer;
+    private BottomNavigationView bottomNavigationView;
+    final FragmentManager fragmentManager = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rvPosts = findViewById(R.id.rvPosts);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        allPosts = new ArrayList<>();
-        adapter = new PostsAdapter(this, allPosts);
 
-        rvPosts.setAdapter(adapter);
-        rvPosts.setLayoutManager(new LinearLayoutManager(this));
-        queryPosts();
 
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
-                fetchTimelineAsync(0);
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Fragment fragment;
+                switch(item.getItemId()) {
+                    case R.id.action_home:
+                        Toast.makeText(MainActivity.this, "Home!", Toast.LENGTH_SHORT).show();
+                        fragment = new HomeFragment();
+                        break;
+                    case R.id.action_compose:
+                        Toast.makeText(MainActivity.this, "Compose!", Toast.LENGTH_SHORT).show();
+                        fragment = new ComposeFragment();
+                        break;
+                    case R.id.action_profile:
+                    default:
+                        Toast.makeText(MainActivity.this, "Profile!", Toast.LENGTH_SHORT).show();
+                        fragment = new ProfileFragment();
+                       break;
+
+                }
+                fragmentManager.beginTransaction().replace(R.id.flContainer,fragment).commit();
+                return true;
             }
         });
-        // Configure the refreshing colors
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
 
+        bottomNavigationView.setSelectedItemId(R.id.action_home);
     }
 
     @Override
@@ -74,16 +69,9 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId()==R.id.logout){
             logout();
         }
-        if (item.getItemId()==R.id.newpost){
-            newpost();
-        }
         return true;
     }
 
-    private void newpost() {
-        Intent intent = new Intent(this, CreationActivity.class);
-        startActivity(intent);
-    }
 
     private void logout() {
         ParseUser.logOutInBackground();
@@ -94,46 +82,6 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    private void queryPosts(){
-        // specify what type of data we want to query - Post.class
-        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-        // include data referred by user key
-        query.include(Post.KEY_USER);
-
-        query.whereEqualTo("user",ParseUser.getCurrentUser());
 
 
-
-        // limit query to latest 20 items
-        query.setLimit(20);
-        // order posts by creation date (newest first)
-        query.addDescendingOrder("createdAt");
-        // start an asynchronous call for posts
-        query.findInBackground(new FindCallback<Post>() {
-            @Override
-            public void done(List<Post> posts, ParseException e) {
-                // check for errors
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting posts", e);
-                    return;
-                }
-
-                // for debugging purposes let's print every post description to logcat
-                for (Post post : posts) {
-                    Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
-                }
-
-                // save received posts to list and notify adapter of new data
-                allPosts.addAll(posts);
-                adapter.notifyDataSetChanged();
-            }
-        });
-    }
-
-
-    public void fetchTimelineAsync(int page) {
-        adapter.clear();
-        queryPosts();
-        swipeContainer.setRefreshing(false);
-    }
 }

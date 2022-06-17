@@ -14,7 +14,6 @@ import org.parceler.Parcels;
 
 public class DetailsActivity extends AppCompatActivity {
     Post post;
-
     TextView tvTitle;
     TextView tvDescription;
     ImageView ivImage;
