@@ -30,6 +30,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         this.posts = posts;
     }
 
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,6 +42,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Post post = posts.get(position);
         holder.bind(post);
+
     }
 
     @Override
@@ -67,6 +69,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         TextView tvDescription;
         TextView tvUsername2;
         TextView tvTimeStamp;
+        ImageView ivLikes;
+        ImageView ivLikesActive;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivPost = itemView.findViewById(R.id.ivImage);
@@ -74,20 +78,40 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvUsername2 = itemView.findViewById(R.id.tvTitle2);
             tvTimeStamp = itemView.findViewById(R.id.tvTimeStamp);
+            ivLikes = itemView.findViewById(R.id.ivLike);
+            ivLikesActive = itemView.findViewById(R.id.ivLikeActive);
             itemView.setOnClickListener(this);
-        }
+            ivLikes.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ivLikes.setVisibility(View.INVISIBLE);
+                    ivLikesActive.setVisibility(View.VISIBLE);
 
+                }
+            });
+            ivLikesActive.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ivLikes.setVisibility(View.VISIBLE);
+                    ivLikesActive.setVisibility(View.INVISIBLE);
+                }
+            });
+
+        }
         public void bind(Post post) {
+
             tvUsername.setText(post.getUser().getUsername());
             tvUsername2.setText(post.getUser().getUsername());
             tvDescription.setText(post.getDescription());
             tvTimeStamp.setText(calculateTimeAgo(post.getCreatedAt()));
+
             ParseFile image = post.getImage();
             if (image != null) {
                 Glide.with(context).load(image.getUrl()).into(ivPost);
             }
 
         }
+
 
         @Override
         public void onClick(View v) {
@@ -101,6 +125,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
         }
     }
+
+
 
     public static String calculateTimeAgo(Date createdAt) {
 

@@ -1,6 +1,8 @@
 package com.example.instagram.fragments;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.example.instagram.Post;
 import com.parse.FindCallback;
@@ -9,6 +11,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.List;
+
+
 
 public class ProfileFragment extends HomeFragment {
 
@@ -37,4 +41,7 @@ public class ProfileFragment extends HomeFragment {
             }
         });
     }
+
+
+
 }
